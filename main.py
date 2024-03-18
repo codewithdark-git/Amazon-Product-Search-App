@@ -117,7 +117,7 @@ def main():
                 else:
                     st.write(f"No products found for '{item_name}'.")
 
-        elif page == "Search item":
+        elif page == "Search Items":
                 # Display search input and results
             search_query = st.text_input("Enter your search query:")
             if search_query:
