@@ -40,22 +40,30 @@ def get_search_results(search_query):
 
 def extract_product_info(search_results):
     products = []
-    results = search_results.find_all("div", class_="s-result-item")
-    for result in results:
-        title_element = result.find("span", class_="a-size-medium")
-        price_element = result.find("span", class_="a-price")
-        image_element = result.find("img", class_="s-image")
-        review_count = result.find("span", class_="a-size-base")
-        deal_element = result.find("span", class_="a-badge-text")
-        if title_element and price_element and image_element:
-            title = title_element.get_text().strip()
-            price = price_element.find("span", class_="a-offscreen").get_text().strip()
-            image_url = image_element["src"]
-            link = result.find("a", class_="a-link-normal")["href"]
-            reviews = review_count.get_text().strip() if review_count else "No reviews"
-            is_deal = bool(deal_element)  # Check if deal_element exists
-            products.append({"title": title, "price": price, "image_url": image_url, "link": link, "reviews": reviews, "is_deal": is_deal})
-    return products
+    try:
+        results = search_results.find_all("div", class_="s-result-item")
+        for result in results:
+            title_element = result.find("span", class_="a-size-medium")
+            price_element = result.find("span", class_="a-price")
+
+            image_element = result.find("img", class_="s-image")
+            review_count_element = result.find("span", class_="a-size-base")
+            deal_element = result.find("span", class_="a-badge-text", text="Deal of the Day")
+
+            if title_element and price_element and image_element:
+                title = title_element.get_text().strip()
+                price = price_element.find("span", class_="a-offscreen").get_text().strip()
+                image_url = image_element["src"]
+                link = result.find("a", class_="a-link-normal")["href"]
+                reviews = review_count_element.get_text().strip() if review_count_element else "No reviews"
+                is_deal = bool(deal_element)  # Check if deal_element exists
+                products.append(
+                    {"title": title, "price": price, "image_url": image_url, "link": link, "reviews": reviews,
+                     "is_deal": is_deal})
+        return products
+    except Exception as e:
+        st.error(f"Error extracting product info: {e}")
+        return []
 
 
 def main():
