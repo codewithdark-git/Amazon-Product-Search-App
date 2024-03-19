@@ -41,7 +41,7 @@ def get_search_results(search_query):
 def extract_product_info(search_results):
     products = []
     try:
-        results = search_results.find_all("div", class_="s-result-item")
+        results = search_results.find("div", class_="s-result-item")
         for result in results:
             title_element = result.find("span", class_="a-size-medium")
             price_element = result.find("span", class_="a-price")
@@ -64,6 +64,12 @@ def extract_product_info(search_results):
     except Exception as e:
         st.error(f"Error extracting product info: {e}")
         return []
+
+    except RuntimeError:
+        st.error("An error occurred. Please try again.")
+
+    except ConnectionError:
+        st.error("A connection error occurred. Please check your internet connection and try again.")
 
 
 def main():
