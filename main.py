@@ -42,33 +42,38 @@ def get_search_results(search_query):
 
 
 def extract_product_info(search_results):
-    products = []
-    if search_results is None:
-        return products  # Return an empty list if search results are not available
 
     try:
+        products = []
         results = search_results.find_all("div", class_="s-result-item")
         for result in results:
             title_element = result.find("span", class_="a-size-medium")
             price_element = result.find("span", class_="a-price")
+
             image_element = result.find("img", class_="s-image")
-            review_count = result.find("span", class_="a-size-base")
+            review_count_element = result.find("span", class_="a-size-base")
             deal_element = result.find("span", class_="a-badge-text")
+
             if title_element and price_element and image_element:
                 title = title_element.get_text().strip()
                 price = price_element.find("span", class_="a-offscreen").get_text().strip()
                 image_url = image_element["src"]
                 link = result.find("a", class_="a-link-normal")["href"]
-                reviews = review_count.get_text().strip() if review_count else "No reviews"
+                reviews = review_count_element.get_text().strip() if review_count_element else "No reviews"
                 is_deal = bool(deal_element)  # Check if deal_element exists
-                products.append({"title": title, "price": price, "image_url": image_url, "link": link, "reviews": reviews, "is_deal": is_deal})
-
+                products.append(
+                    {"title": title, "price": price, "image_url": image_url, "link": link, "reviews": reviews,
+                     "is_deal": is_deal})
+        return products
     except Exception as e:
         st.error(f"Error extracting product info: {e}")
+        return []
 
-    return products
+    except RuntimeError:
+        st.error("An error occurred. Please try again.")
 
-
+    except ConnectionError:
+        st.error("A connection error occurred. Please check your internet connection and try again.")
 
 
 def main():
@@ -79,7 +84,7 @@ def main():
 
         if page == "Home":
             # Fetch and display products for a random item category
-            item_categories = [
+            random_item_names = [
                 "TVs", "Home Audio & Theater", "Camera & Photo", "Cell Phones & Accessories", "Headphones",
                 "Bluetooth & Wireless Speakers", "Car Electronics", "Musical Instruments", "Wearable Technology",
                 "Electronics Accessories & Supplies", "Amazon Devices", "Portable Audio & Video", "Office Electronics",
@@ -88,65 +93,67 @@ def main():
                 "Outdoor Recreation Features", "Camping & Hiking", "Climbing", "Skates, Skateboards & Scooters",
                 "Water Sports", "Winter Sports", "Cycling", "Accessories", "Action Cameras & Accessories",
                 "Drones & Accessories", "Remote & App Controlled Vehicles & Parts", "Remote & App Controlled Vehicle Parts",
-                "Remote & App Controlled Vehicles", "Tricycles, Scooters & Wagons", "Ride-On Toys & Accessories",
+                "Tricycles, Scooters & Wagons", "Ride-On Toys & Accessories",
                 "Electrical", "Industrial & Scientific", "Janitorial & Sanitation Supplies", "Food Service Equipment & Supplies",
-                "Material Handling Products", "Lab & Scientific Products", "Abrasive & Finishing Products",
+                "Material Handling Products", "Lab & Scientific Products",
                 "Retail Store Fixtures & Equipment", "Commercial Lighting", "Commercial Lighting Fixtures",
                 "Commercial Lighting", "Professional Medical Supplies", "Professional Dental Supplies",
             ]
 
             num_items = random.randint(8, 12)
-            selected_item_names = random.sample(item_categories, num_items)
+            selected_item_names = random.sample(random_item_names, num_items)
 
-            found_products = {category: False for category in item_categories}
+            for item_name in selected_item_names:
+                search_results = get_search_results(item_name)
+                if search_results:
+                    products = extract_product_info(search_results)
+                    if products:
+                        for idx, product in enumerate(products, start=1):
+                            col1, col2 = st.columns([1, 3])
+                            with col1:
+                                st.image(product['image_url'])
+                            with col2:
+                                st.markdown(f"{product['title']}")
+                                st.subheader(f"{product['price']}")
+                                st.write(f"**Reviews:** {product['reviews']}")
+                                st.write("Deal Available" if product['is_deal'] else "No Deal Available")
+                                st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
+                            st.markdown("---")
+                    else:
+                        st.write(f"No products found for '{item_name}'.")
 
-            # Fetch and display products for each item category
-            for item_category in item_categories:
-                search_results = get_search_results(item_category)
-                products = extract_product_info(search_results)
-                if products:
-                    found_products[item_category] = True  # Update found_products dictionary
-                    st.header(item_category)
-                    for product in products:
-                        col1, col2 = st.columns([1, 3])
-                        with col1:
-                            st.image(product['image_url'])
-                        with col2:
-                            st.markdown(f"{product['title']}")
-                            st.subheader(f"{product['price']}")
-                            st.write(f"**Reviews:** {product['reviews']}")
-                            st.write("Deal Available" if product['is_deal'] else "No Deal Available")
-                            st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
-                        st.markdown("---")
                 else:
-                    if not found_products[item_category]:  # Display "No products found" message only if no products are found
-                        st.write(f"No products found for '{item_category}'. Please try Again.")
+                    st.error("Amazon server is currently unavailable. Please try again later.")
+
 
         elif page == "Search Items":
             # Display search input and results
             search_query = st.text_input("Enter your search query:")
             if search_query:
                 search_results = get_search_results(search_query)
-                products = extract_product_info(search_results)
-                if products:
-                    # Display the search results
-                    st.title("Search Results:")
-                    for product in products:
-                        col1, col2 = st.columns([1, 3])
-                        with col1:
-                            st.image(product['image_url'])
-                        with col2:
-                            st.markdown(f"{product['title']}")
-                            st.subheader(f"{product['price']}")
-                            st.write(f"**Reviews:** {product['reviews']}")
-                            st.write("Deal Available" if product['is_deal'] else "No Deal Available")
-                            st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
-                        st.markdown("---")
+                if search_results:
+                    products = extract_product_info(search_results)
+                    if products:
+                        # Display the search results
+                        st.title("Search Results:")
+                        for idx, product in enumerate(products, start=1):
+                            col1, col2 = st.columns([1, 3])
+                            with col1:
+                                st.image(product['image_url'])
+                            with col2:
+                                st.markdown(f"{product['title']}")
+                                st.subheader(f"{product['price']}")
+                                st.write(f"**Reviews:** {product['reviews']}")
+                                st.write("Deal Available" if product['is_deal'] else "No Deal Available")
+                                st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
+                            st.markdown("---")
+                    else:
+                        st.write(f"No products found for '{search_query}'.")
                 else:
-                    if not found_products[item_category]:
-                        st.write(f"No products found for '{item_category}'. Please try Again.")
+                    st.error("Amazon server is currently unavailable. Please try again later.")
+
     except Exception as e:
-        st.error(f"Error Accur {e}")
+        st.error(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     main()
