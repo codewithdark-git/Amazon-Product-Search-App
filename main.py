@@ -74,81 +74,98 @@ def extract_product_info(search_results):
 
 
 def main():
-    st.title("Amazon Product Search")
+    try:
+        st.title("Amazon Product Search")
 
-    page = st.radio("Navigate", ["Home", "Search Items"])
+        page = st.radio("Navigate", ["Home", "Search Items"])
 
-    if page == "Home":
-        # Fetch and display products for a random item category
-        random_item_names = [
-            "Laptops",
-            "Computer Monitors",
-            "Computer Networking",
-            "Computer Servers",
-            "Computer Components",
-            "Computer Accessories",
-            "Computer Peripherals",
-            "External Hard Drives",
-            "Solid State Drives",
-            "Graphics Cards",
-            "RAM Memory",
-            "Processors",
-            "Keyboards",
-            "Mice",
-            "Webcams",
-            "Headsets",
-            "Printers",
-            "Scanners",
-            "Projectors",
-            "UPS (Uninterruptible Power Supply)",
-        ]
+        if page == "Home":
+            # Fetch and display products for a random item category
+            random_item_names = [
+                "Laptops",
+                "Computer Monitors",
+                "Computer Networking",
+                "Computer Servers",
+                "Computer Components",
+                "Computer Accessories",
+                "Computer Peripherals",
+                "External Hard Drives",
+                "Solid State Drives",
+                "Graphics Cards",
+                "RAM Memory",
+                "Processors",
+                "Keyboards",
+                "Mice",
+                "Webcams",
+                "Headsets",
+                "Printers",
+                "Scanners",
+                "Projectors",
+                "UPS (Uninterruptible Power Supply)",
+            ]
 
-        num_items = random.randint(10, 15)
-        selected_item_names = random.sample(random_item_names, num_items)
+            num_items = random.randint(3, 4)
+            selected_item_names = random.sample(random_item_names, num_items)
 
-        for item_name in selected_item_names:
-            search_results = get_search_results(item_name)
-            products = extract_product_info(search_results)
-            if products:
-                for idx, product in enumerate(products, start=1):
-                    col1, col2 = st.columns([1, 3])
-                    with col1:
-                        st.image(product['image_url'])
-                    with col2:
-                        st.markdown(f"{product['title']}")
-                        st.subheader(f"{product['price']}")
-                        st.write(f"**Reviews:** {product['reviews']}")
-                        st.write("Deal Available" if product['is_deal'] else "No Deal Available")
-                        st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
-                    st.markdown("---")
-            else:
-                st.write(f"No products found for '{item_name}'.")
+            for item_name in selected_item_names:
+                search_results = get_search_results(item_name)
+                if search_results:
+                    products = extract_product_info(search_results)
+                    if products:
+                        for idx, product in enumerate(products, start=1):
+                            col1, col2 = st.columns([1, 3])
+                            with col1:
+                                st.image(product['image_url'])
+                            with col2:
+                                st.markdown(f"{product['title']}")
+                                st.subheader(f"{product['price']}")
+                                st.write(f"**Reviews:** {product['reviews']}")
+                                st.write(f"{product['is_deal']}")
+                                st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
+                            st.markdown("---")
+                    else:
+                        st.write(f"No products found for '{item_name}'.")
 
-    elif page == "Search Items":
-        # Display search input and results
-        search_query = st.text_input("Enter your search query:")
-        if search_query:
-            search_results = get_search_results(search_query)
-            if search_results:
-                products = extract_product_info(search_results)
-                if products:
-                    # Display the search results
-                    st.title("Search Results:")
-                    for idx, product in enumerate(products, start=1):
-                        col1, col2 = st.columns([1, 3])
-                        with col1:
-                            st.image(product['image_url'])
-                        with col2:
-                            st.markdown(f"{product['title']}")
-                            st.subheader(f"{product['price']}")
-                            st.write(f"**Reviews:** {product['reviews']}")
-                            st.write("Deal Available" if product['is_deal'] else "No Deal Available")
-                            st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
-                        st.markdown("---")
+        elif page == "Search Items":
+            # Display search input and results
+            search_query = st.text_input("Enter your search query:")
+            if search_query:
+                search_results = get_search_results(search_query)
+                if search_results:
+                    products = extract_product_info(search_results)
+                    if products:
+                        # Display the search results
+                        st.title("Search Results:")
+                        for idx, product in enumerate(products, start=1):
+                            col1, col2 = st.columns([1, 3])
+                            with col1:
+                                st.image(product['image_url'])
+                            with col2:
+                                st.markdown(f"{product['title']}")
+                                st.subheader(f"{product['price']}")
+                                st.write(f"**Reviews:** {product['reviews']}")
+                                st.write(f"{product['is_deal']}")
+                                st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
+                            st.markdown("---")
+                    else:
+                        st.write(f"No products found for '{search_query}'.")
                 else:
-                    st.write(f"No products found for '{search_query}'.")
-            else:
-                st.write(f"Failed to fetch search results for '{search_query}'. Please try again later.")
+                    st.error("No search results found. Please try again.")
+
+    except requests.exceptions.HTTPError as e:
+        if str(e.response.status_code) == "503":
+            st.error("Amazon server is currently unavailable. Please try again later.")
+        else:
+            st.error(f"An error occurred: {e}")
+
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+
+    except RuntimeError:
+        st.error("An error occurred. Please try again.")
+
+    except ConnectionError:
+        st.error("A connection error occurred. Please check your internet connection and try again.")
 
 if __name__ == "__main__":
     main()
