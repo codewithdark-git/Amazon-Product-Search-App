@@ -39,9 +39,10 @@ def get_search_results(search_query):
 
 
 def extract_product_info(search_results):
-    products = []
+
     try:
-        results = search_results.find("div", class_="s-result-item")
+        products = []
+        results = search_results.find_all("div", class_="s-result-item")
         for result in results:
             title_element = result.find("span", class_="a-size-medium")
             price_element = result.find("span", class_="a-price")
