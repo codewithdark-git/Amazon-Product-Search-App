@@ -52,11 +52,13 @@ def extract_product_info(search_results):
                 products.append(
                     {"title": title, "price": price, "image_url": image_url, "link": link, "reviews": reviews,
                      "is_deal": is_deal})
-        return products
+
+
     except Exception as e:
         logging.error(f"Error extracting product info: {e}")
         return []
-
+    
+    return products
 
 def main():
     try:
