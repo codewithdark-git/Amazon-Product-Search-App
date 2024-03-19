@@ -23,7 +23,7 @@ def extract_product_info(search_results):
         price_element = result.find("span", class_="a-price")
         image_element = result.find("img", class_="s-image")
         review_count = result.find("span", class_="a-size-base")
-        deal_element = result.find("span", class_="a-badge-text", text="Deal of the Day")
+        deal_element = result.find("span", class_="a-badge-text")
         if title_element and price_element and image_element:
             title = title_element.get_text().strip()
             price = price_element.find("span", class_="a-offscreen").get_text().strip()
@@ -58,7 +58,7 @@ def main():
             "Commercial Lighting", "Professional Medical Supplies", "Professional Dental Supplies",
         ]
 
-        num_items = random.randint(3, 4)
+        num_items = random.randint(10, 15)
         selected_item_names = random.sample(random_item_names, num_items)
 
         for item_name in selected_item_names:
