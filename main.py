@@ -124,7 +124,21 @@ def main():
                     else:
                         st.write(f"No products found for '{item_name}'.")
                 else:
-                    st.write(f"Failed to fetch search results for '{item_name}'.")
+                    products = extract_product_info(search_results)
+                    if products:
+                        for product in products:
+                            col1, col2 = st.columns([1, 3])
+                            with col1:
+                                st.image(product['image_url'])
+                            with col2:
+                                st.markdown(f"{product['title']}")
+                                st.subheader(f"{product['price']}")
+                                st.write(f"**Reviews:** {product['reviews']}")
+                                st.write("Deal Available" if product['is_deal'] else "No Deal Available")
+                                st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
+                            st.markdown("---")
+                    else:
+                        st.write(f"No products found for '{item_name}'.")
 
         elif page == "Search Items":
             # Display search input and results
