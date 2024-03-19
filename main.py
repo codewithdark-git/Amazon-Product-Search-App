@@ -4,8 +4,11 @@ import streamlit as st
 import random
 import time
 
+MAX_RETRIES = 3
+DELAY_SECONDS = 5
 
-def get_search_results(search_query):
+
+def get_search_results(search_query, retries=MAX_RETRIES):
     try:
         url = f"https://www.amazon.com/s?k={search_query}"
 
@@ -27,8 +30,13 @@ def get_search_results(search_query):
         soup = BeautifulSoup(response.content, "html.parser")
         return soup
     except requests.RequestException as e:
-        st.error(f"Error fetching search results: {e}")
-        return None
+        if retries > 0:
+            st.warning(f"Error fetching search results: {e}. Retrying in {DELAY_SECONDS} seconds...")
+            time.sleep(DELAY_SECONDS)
+            return get_search_results(search_query, retries=retries - 1)
+        else:
+            st.error("Failed to fetch search results. Please try again later.")
+            return None
 
 
 def extract_product_info(search_results):
@@ -124,21 +132,7 @@ def main():
                     else:
                         st.write(f"No products found for '{item_name}'.")
                 else:
-                    products = extract_product_info(search_results)
-                    if products:
-                        for product in products:
-                            col1, col2 = st.columns([1, 3])
-                            with col1:
-                                st.image(product['image_url'])
-                            with col2:
-                                st.markdown(f"{product['title']}")
-                                st.subheader(f"{product['price']}")
-                                st.write(f"**Reviews:** {product['reviews']}")
-                                st.write("Deal Available" if product['is_deal'] else "No Deal Available")
-                                st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
-                            st.markdown("---")
-                    else:
-                        st.write(f"No products found for '{item_name}'.")
+                    st.write(f"Failed to fetch search results for '{item_name}'.")
 
         elif page == "Search Items":
             # Display search input and results
