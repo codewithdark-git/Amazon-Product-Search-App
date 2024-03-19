@@ -40,7 +40,7 @@ def main():
     try:
         st.title("Amazon Product Search")
 
-        page = st.selectbox("Navigate", ["Home", "Search Items"])
+        page = st.radio("Navigate", ["Home", "Search Items"])
 
         if page == "Home":
             # Fetch and display products for a random item category
@@ -96,7 +96,7 @@ def main():
                     "Professional Medical Supplies",
                     "Professional Dental Supplies",]
 
-            num_items = random.randint(3, 4)
+            num_items = random.randint(10, 15)
             selected_item_names = random.sample(random_item_names, num_items)
 
             for item_name in selected_item_names:
@@ -117,7 +117,7 @@ def main():
                 else:
                     st.write(f"No products found for '{item_name}'.")
 
-        elif page == "Search item":
+        elif page == "Search Items":
                 # Display search input and results
             search_query = st.text_input("Enter your search query:")
             if search_query:
