@@ -79,6 +79,8 @@ def main():
 
         page = st.radio("Navigate", ["Home", "Search Items"])
 
+        st.markdown("----")
+
         if page == "Home":
             # Fetch and display products for a random item category
             random_item_names = [
