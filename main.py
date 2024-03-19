@@ -4,11 +4,8 @@ import streamlit as st
 import random
 import time
 
-MAX_RETRIES = 3
-DELAY_SECONDS = 5
 
-
-def get_search_results(search_query, retries=MAX_RETRIES):
+def get_search_results(search_query):
     try:
         url = f"https://www.amazon.com/s?k={search_query}"
 
@@ -30,13 +27,8 @@ def get_search_results(search_query, retries=MAX_RETRIES):
         soup = BeautifulSoup(response.content, "html.parser")
         return soup
     except requests.RequestException as e:
-        if retries > 0:
-            st.warning(f"Error fetching search results: {e}. Retrying in {DELAY_SECONDS} seconds...")
-            time.sleep(DELAY_SECONDS)
-            return get_search_results(search_query, retries=retries - 1)
-        else:
-            st.error("Failed to fetch search results. Please try again later.")
-            return None
+        st.error(f"Error fetching search results: {e}")
+        return None
 
 
 def extract_product_info(search_results):
