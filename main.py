@@ -2,17 +2,40 @@ import requests
 from bs4 import BeautifulSoup
 import streamlit as st
 import random
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 
 def get_search_results(search_query):
-    url = f"https://www.amazon.com/s?k={search_query}"
-    header = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
-        "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8"
-    }
-    response = requests.get(url, headers=header)
-    soup = BeautifulSoup(response.content, "html.parser")
-    return soup
+    try:
+        url = f"https://www.amazon.com/s?k={search_query}"
+
+        headers_list = [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36",
+        ]
+
+        user_agent = random.choice(headers_list)
+
+        headers = {
+            "User-Agent": user_agent,
+            "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8"
+        }
+
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+
+        logging.info(f"Response status code: {response.status_code}")
+
+        soup = BeautifulSoup(response.content, "html.parser")
+        return soup
+    except requests.RequestException as e:
+        logging.error(f"Error fetching search results: {e}")
+        return None
 
 
 def extract_product_info(search_results):
@@ -43,19 +66,26 @@ def main():
     if page == "Home":
         # Fetch and display products for a random item category
         random_item_names = [
-            "TVs", "Home Audio & Theater", "Camera & Photo", "Cell Phones & Accessories", "Headphones",
-            "Bluetooth & Wireless Speakers", "Car Electronics", "Musical Instruments", "Wearable Technology",
-            "Electronics Accessories & Supplies", "Amazon Devices", "Portable Audio & Video", "Office Electronics",
-            "Sports & Fitness", "Outdoor Recreation", "Sports & Fitness Features", "Sports & Outdoor Play",
-            "Exercise & Fitness", "Golf", "Fan Shop", "Sports Collectibles", "Outdoor Clothing",
-            "Outdoor Recreation Features", "Camping & Hiking", "Climbing", "Skates, Skateboards & Scooters",
-            "Water Sports", "Winter Sports", "Cycling", "Accessories", "Action Cameras & Accessories",
-            "Drones & Accessories", "Remote & App Controlled Vehicles & Parts", "Remote & App Controlled Vehicle Parts",
-            "Remote & App Controlled Vehicles", "Tricycles, Scooters & Wagons", "Ride-On Toys & Accessories",
-            "Electrical", "Industrial & Scientific", "Janitorial & Sanitation Supplies", "Food Service Equipment & Supplies",
-            "Material Handling Products", "Lab & Scientific Products", "Abrasive & Finishing Products",
-            "Retail Store Fixtures & Equipment", "Commercial Lighting", "Commercial Lighting Fixtures",
-            "Commercial Lighting", "Professional Medical Supplies", "Professional Dental Supplies",
+            "Laptops",
+            "Computer Monitors",
+            "Computer Networking",
+            "Computer Servers",
+            "Computer Components",
+            "Computer Accessories",
+            "Computer Peripherals",
+            "External Hard Drives",
+            "Solid State Drives",
+            "Graphics Cards",
+            "RAM Memory",
+            "Processors",
+            "Keyboards",
+            "Mice",
+            "Webcams",
+            "Headsets",
+            "Printers",
+            "Scanners",
+            "Projectors",
+            "UPS (Uninterruptible Power Supply)",
         ]
 
         num_items = random.randint(10, 15)
@@ -84,24 +114,26 @@ def main():
         search_query = st.text_input("Enter your search query:")
         if search_query:
             search_results = get_search_results(search_query)
-            products = extract_product_info(search_results)
-
-            if products:
-                # Display the search results
-                st.title("Search Results:")
-                for idx, product in enumerate(products, start=1):
-                    col1, col2 = st.columns([1, 3])
-                    with col1:
-                        st.image(product['image_url'])
-                    with col2:
-                        st.markdown(f"{product['title']}")
-                        st.subheader(f"{product['price']}")
-                        st.write(f"**Reviews:** {product['reviews']}")
-                        st.write("Deal Available" if product['is_deal'] else "No Deal Available")
-                        st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
-                    st.markdown("---")
+            if search_results:
+                products = extract_product_info(search_results)
+                if products:
+                    # Display the search results
+                    st.title("Search Results:")
+                    for idx, product in enumerate(products, start=1):
+                        col1, col2 = st.columns([1, 3])
+                        with col1:
+                            st.image(product['image_url'])
+                        with col2:
+                            st.markdown(f"{product['title']}")
+                            st.subheader(f"{product['price']}")
+                            st.write(f"**Reviews:** {product['reviews']}")
+                            st.write("Deal Available" if product['is_deal'] else "No Deal Available")
+                            st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
+                        st.markdown("---")
+                else:
+                    st.write(f"No products found for '{search_query}'.")
             else:
-                st.write(f"No products found for '{search_query}'.")
+                st.write(f"Failed to fetch search results for '{search_query}'. Please try again later.")
 
 if __name__ == "__main__":
     main()
