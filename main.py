@@ -96,52 +96,45 @@ def main():
 
             for item_name in selected_item_names:
                 search_results = get_search_results(item_name)
-                if search_results:
-                    products = extract_product_info(search_results)
-                    if products:
-                        for idx, product in enumerate(products, start=1):
-                            col1, col2 = st.columns([1, 3])
-                            with col1:
-                                st.image(product['image_url'])
-                            with col2:
-                                st.markdown(f"{product['title']}")
-                                st.subheader(f"{product['price']}")
-                                st.write(f"**Reviews:** {product['reviews']}")
-                                st.write("Deal Available" if product['is_deal'] else "No Deal Available")
-                                st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
-                            st.markdown("---")
-                    else:
-                        st.write(f"No products found for '{item_name}'.")
-
+                products = extract_product_info(search_results)
+                if products:
+                    for idx, product in enumerate(products, start=1):
+                        col1, col2 = st.columns([1, 3])
+                        with col1:
+                            st.image(product['image_url'])
+                        with col2:
+                            st.markdown(f"{product['title']}")
+                            st.subheader(f"{product['price']}")
+                            st.write(f"**Reviews:** {product['reviews']}")
+                            st.write("Deal Available" if product['is_deal'] else "No Deal Available")
+                            st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
+                        st.markdown("---")
                 else:
-                    st.error("Amazon server is currently unavailable. Please try again later.")
-
+                    st.write(f"No products found for '{item_name}'.")
 
         elif page == "Search Items":
             # Display search input and results
             search_query = st.text_input("Enter your search query:")
             if search_query:
                 search_results = get_search_results(search_query)
-                if search_results:
-                    products = extract_product_info(search_results)
-                    if products:
-                        # Display the search results
-                        st.title("Search Results:")
-                        for idx, product in enumerate(products, start=1):
-                            col1, col2 = st.columns([1, 3])
-                            with col1:
-                                st.image(product['image_url'])
-                            with col2:
-                                st.markdown(f"{product['title']}")
-                                st.subheader(f"{product['price']}")
-                                st.write(f"**Reviews:** {product['reviews']}")
-                                st.write("Deal Available" if product['is_deal'] else "No Deal Available")
-                                st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
-                            st.markdown("---")
-                    else:
-                        st.write(f"No products found for '{search_query}'.")
+                products = extract_product_info(search_results)
+                if products:
+                    # Display the search results
+                    st.title("Search Results:")
+                    for idx, product in enumerate(products, start=1):
+                        col1, col2 = st.columns([1, 3])
+                        with col1:
+                            st.image(product['image_url'])
+                        with col2:
+                            st.markdown(f"{product['title']}")
+                            st.subheader(f"{product['price']}")
+                            st.write(f"**Reviews:** {product['reviews']}")
+                            st.write("Deal Available" if product['is_deal'] else "No Deal Available")
+                            st.link_button("View on Amazon", f"https://www.amazon.com{product['link']}")
+                        st.markdown("---")
                 else:
-                    st.error("Amazon server is currently unavailable. Please try again later.")
+                    st.write(f"No products found for '{search_query}'.")
+
 
     except Exception as e:
         st.error(f"An error occurred: {e}")
