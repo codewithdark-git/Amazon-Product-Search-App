@@ -42,7 +42,7 @@ This is a Streamlit web application that allows users to search for products on 
 
 ## Credits
 
-This app was created by [Your Name].
+This app was created by Dark Coder.
 
 ## License
 
