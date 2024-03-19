@@ -78,35 +78,28 @@ def main():
         st.title("Amazon Product Search")
 
         page = st.radio("Navigate", ["Home", "Search Items"])
-
+        
         st.markdown("----")
 
         if page == "Home":
             # Fetch and display products for a random item category
             random_item_names = [
-                "Laptops",
-                "Computer Monitors",
-                "Computer Networking",
-                "Computer Servers",
-                "Computer Components",
-                "Computer Accessories",
-                "Computer Peripherals",
-                "External Hard Drives",
-                "Solid State Drives",
-                "Graphics Cards",
-                "RAM Memory",
-                "Processors",
-                "Keyboards",
-                "Mice",
-                "Webcams",
-                "Headsets",
-                "Printers",
-                "Scanners",
-                "Projectors",
-                "UPS (Uninterruptible Power Supply)",
+                "TVs", "Home Audio & Theater", "Camera & Photo", "Cell Phones & Accessories", "Headphones",
+                "Bluetooth & Wireless Speakers", "Car Electronics", "Musical Instruments", "Wearable Technology",
+                "Electronics Accessories & Supplies", "Amazon Devices", "Portable Audio & Video", "Office Electronics",
+                "Sports & Fitness", "Outdoor Recreation", "Sports & Fitness Features", "Sports & Outdoor Play",
+                "Exercise & Fitness", "Golf", "Fan Shop", "Sports Collectibles", "Outdoor Clothing",
+                "Outdoor Recreation Features", "Camping & Hiking", "Climbing", "Skates, Skateboards & Scooters",
+                "Water Sports", "Winter Sports", "Cycling", "Accessories", "Action Cameras & Accessories",
+                "Drones & Accessories", "Remote & App Controlled Vehicles & Parts", "Remote & App Controlled Vehicle Parts",
+                "Remote & App Controlled Vehicles", "Tricycles, Scooters & Wagons", "Ride-On Toys & Accessories",
+                "Electrical", "Industrial & Scientific", "Janitorial & Sanitation Supplies", "Food Service Equipment & Supplies",
+                "Material Handling Products", "Lab & Scientific Products", "Abrasive & Finishing Products",
+                "Retail Store Fixtures & Equipment", "Commercial Lighting", "Commercial Lighting Fixtures",
+                "Commercial Lighting", "Professional Medical Supplies", "Professional Dental Supplies",
             ]
 
-            num_items = random.randint(3, 4)
+            num_items = random.randint(8, 12)
             selected_item_names = random.sample(random_item_names, num_items)
 
             for item_name in selected_item_names:
@@ -152,22 +145,10 @@ def main():
                     else:
                         st.write(f"No products found for '{search_query}'.")
                 else:
-                    st.error("No search results found. Please try again.")
-
-    except requests.exceptions.HTTPError as e:
-        if str(e.response.status_code) == "503":
-            st.error("Amazon server is currently unavailable. Please try again later.")
-        else:
-            st.error(f"An error occurred: {e}")
+                    st.error("Amazon server is currently unavailable. Please try again later.")
 
     except Exception as e:
         st.error(f"An error occurred: {e}")
-
-    except RuntimeError:
-        st.error("An error occurred. Please try again.")
-
-    except ConnectionError:
-        st.error("A connection error occurred. Please check your internet connection and try again.")
 
 if __name__ == "__main__":
     main()
