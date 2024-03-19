@@ -12,17 +12,7 @@ def get_search_results(search_query):
     try:
         url = f"https://www.amazon.com/s?k={search_query}"
 
-        ua = UserAgent(browsers=['Safari', 'edge', 'chrome'])
-
-        # headers_list = [
-        #     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-        #     "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0",
-        #     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134",
-        #     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0",
-        #     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36",
-        # ]
-        #
-        # user_agent = random.choice(headers_list)
+        ua = UserAgent(browsers=['Safari', 'edge', 'Google Chrome', 'UC Browser', 'opera', 'Mozilla Firefox', 'Brave'])
 
         headers = {
             "User-Agent": ua.random,
@@ -42,14 +32,12 @@ def get_search_results(search_query):
 
 
 def extract_product_info(search_results):
-
     try:
         products = []
         results = search_results.find_all("div", class_="s-result-item")
         for result in results:
             title_element = result.find("span", class_="a-size-medium")
             price_element = result.find("span", class_="a-price")
-
             image_element = result.find("img", class_="s-image")
             review_count_element = result.find("span", class_="a-size-base")
             deal_element = result.find("span", class_="a-badge-text")
@@ -66,14 +54,8 @@ def extract_product_info(search_results):
                      "is_deal": is_deal})
         return products
     except Exception as e:
-        st.error(f"Error extracting product info: {e}")
+        logging.error(f"Error extracting product info: {e}")
         return []
-
-    except RuntimeError:
-        st.error("An error occurred. Please try again.")
-
-    except ConnectionError:
-        st.error("A connection error occurred. Please check your internet connection and try again.")
 
 
 def main():
@@ -85,19 +67,28 @@ def main():
         if page == "Home":
             # Fetch and display products for a random item category
             random_item_names = [
-                "TVs", "Home Audio & Theater", "Camera & Photo", "Cell Phones & Accessories", "Headphones",
-                "Bluetooth & Wireless Speakers", "Car Electronics", "Musical Instruments", "Wearable Technology",
-                "Electronics Accessories & Supplies", "Amazon Devices", "Portable Audio & Video", "Office Electronics",
-                "Sports & Fitness", "Outdoor Recreation", "Sports & Fitness Features", "Sports & Outdoor Play",
-                "Exercise & Fitness", "Golf", "Fan Shop", "Sports Collectibles", "Outdoor Clothing",
-                "Outdoor Recreation Features", "Camping & Hiking", "Climbing", "Skates, Skateboards & Scooters",
-                "Water Sports", "Winter Sports", "Cycling", "Accessories", "Action Cameras & Accessories",
-                "Drones & Accessories", "Remote & App Controlled Vehicles & Parts", "Remote & App Controlled Vehicle Parts",
-                "Tricycles, Scooters & Wagons", "Ride-On Toys & Accessories",
-                "Electrical", "Industrial & Scientific", "Janitorial & Sanitation Supplies", "Food Service Equipment & Supplies",
-                "Material Handling Products", "Lab & Scientific Products",
-                "Retail Store Fixtures & Equipment", "Commercial Lighting", "Commercial Lighting Fixtures",
-                "Commercial Lighting", "Professional Medical Supplies", "Professional Dental Supplies",
+                "Laptops",
+                "Computer Monitors",
+                "Computer Networking",
+                "Computer Servers",
+                "Computer Components",
+                "Computer Accessories",
+                "Computer Peripherals",
+                "External Hard Drives",
+                "Solid State Drives",
+                "Graphics Cards",
+                "RAM Memory",
+                "Processors",
+                "Keyboards",
+                "Mice",
+                "Webcams",
+                "Headsets",
+                "Printers",
+                "Scanners",
+                "Projectors",
+                "macbook", "iphone",
+                "samsung", "phone",
+                "galaxy notebook"
             ]
 
             num_items = random.randint(8, 12)
@@ -157,4 +148,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
