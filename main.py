@@ -30,24 +30,6 @@ def get_search_results(search_query):
         logging.error(f"Error fetching search results: {e}")
         return None
 
-import time
-
-MAX_RETRIES = 3
-DELAY_SECONDS = 5
-
-def get_search_results_with_retry(search_query):
-    for _ in range(MAX_RETRIES):
-        try:
-            search_results = get_search_results(search_query)
-            if search_results:
-                return search_results
-            else:
-                logging.warning("Empty search results")
-        except requests.RequestException as e:
-            logging.error(f"Error fetching search results: {e}")
-        time.sleep(DELAY_SECONDS)
-    return None
-
 
 def extract_product_info(search_results):
     try:
@@ -84,6 +66,7 @@ def main():
 
         page = st.radio("Navigate", ["Home", "Search Items"])
 
+        st.markdown("-----")
         if page == "Home":
             # Fetch and display products for a random item category
             random_item_names = [
@@ -115,7 +98,7 @@ def main():
             selected_item_names = random.sample(random_item_names, num_items)
 
             for item_name in selected_item_names:
-                search_results = get_search_results_with_retry(selected_item_names)
+                search_results = get_search_results(item_name)
                 products = extract_product_info(search_results)
                 if products:
                     for idx, product in enumerate(products, start=1):
@@ -136,7 +119,7 @@ def main():
             # Display search input and results
             search_query = st.text_input("Enter your search query:")
             if search_query:
-                search_results = get_search_results_with_retry(search_query)
+                search_results = get_search_results(search_query)
                 products = extract_product_info(search_results)
                 if products:
                     # Display the search results
