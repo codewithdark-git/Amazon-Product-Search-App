@@ -11,10 +11,10 @@ def get_search_results(search_query):
     try:
         url = f"https://www.amazon.com/s?k={search_query}"
 
-        ua = UserAgent(browsers=['Safari', 'edge', 'Google Chrome', 'UC Browser', 'opera', 'Mozilla Firefox', 'Brave'])
+        # ua = UserAgent(browsers=['Safari', 'edge', 'Google Chrome', 'UC Browser', 'opera', 'Mozilla Firefox', 'Brave'])
 
         headers = {
-            "User-Agent": ua.random,
+            "User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
             "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8"
         }
 
