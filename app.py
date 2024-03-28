@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 
 def get_search_results(search_query):
     try:
-        url = f"https://www.amazon.com/s?k={search_query}"
+        # url = f"https://www.amazon.com/s?k={search_query}"
 
         # ua = UserAgent(browsers=['Safari', 'edge', 'Google Chrome', 'UC Browser', 'opera', 'Mozilla Firefox', 'Brave'])
 
